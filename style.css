@@ -1,0 +1,31 @@
+body {
+    font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+
+.line {
+    fill: none;
+    stroke: steelblue;
+    stroke-width: 2.5px;
+}
+
+.active-line {
+    stroke-width: 5px;
+}
+
+.chart-label {
+    font-size: "40px";
+    font-weight: bold;
+    text-anchor: start;
+    dy: "0.5em";
+}
+
+.active-chart-label {
+    font-size: "20px";
+}

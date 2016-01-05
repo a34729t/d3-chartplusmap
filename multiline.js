@@ -1,0 +1,133 @@
+var svg, xScale, yScale;
+var width, height, margin;
+
+var line = d3.svg.line().interpolate("monotone")
+.x(function(d){ return xScale(d.date); })
+.y(function(d){
+  return yScale(d[valueKey]);
+});
+
+function setupChart(callback) {
+  width = chartWidth;
+  height = chartHeight;
+  margin = {top: 20, right:100, bottom:100, left:70};
+
+  // TODO: Make svg go into correct div instead of failing pathetically
+
+  // draw and append the container
+  svg = d3.select(chartContainerDiv).append("svg")
+  .attr("height", height)
+  .attr("width", width)
+  .append("g")
+  .attr("transform","translate(" + margin.left + "," + margin.right + ")");
+
+  xScale = d3.time.scale()
+  .range([0,width - margin.left - margin.right]);
+
+  yScale = d3.scale.linear()
+  .range([height - margin.top - margin.bottom,0]);
+}
+
+var lineCallback = {
+
+  // TODO: Bold the text of the corresponding label
+
+  mouseover: function(d){
+    var countryName = d[0].name;
+
+    d3.select(this)
+      .attr('stroke-width', '') // Un-sets the "explicit" stroke-width
+      .classed("active-line", true ); // should then accept stroke-width from CSS
+  },
+
+  mouseout: function(d){
+    var countryName = d[0].name;
+
+    d3.select(this)
+      .classed("active-line", false)
+      .attr('stroke-width', function(d) { return d[valueKey]; }) // Re-sets the "explicit" stroke-width
+  }
+};
+
+function renderChart(absoluteMode, valueKey){
+
+  // Y-Axis
+
+  // create axis scale
+  yScale.domain(valueRange(data, valueKey));
+  var yAxis = d3.svg.axis()
+  .scale(yScale)
+  .orient("left");
+
+  // if no axis exists, create one, otherwise update it
+  if (svg.selectAll(".y.axis")[0].length < 1){
+    svg.append("g")
+    .attr("class","y axis")
+    .call(yAxis);
+  } else {
+    svg.selectAll(".y.axis").transition().duration(transitionAnimationDuration).call(yAxis);
+  }
+
+  // X-Axis
+
+  // create axis scale
+  xScale.domain(dateRange(data));
+  var xAxis = d3.svg.axis()
+  .scale(xScale)
+  .orient("bottom");
+
+  yAxisPosition = height - margin.bottom - margin.top;
+  if (svg.selectAll(".x.axis")[0].length < 1){
+    svg.append("g")
+    .attr("class","x axis")
+    .attr("transform", "translate(0," + yAxisPosition + ")")
+    .text("Date")
+    .call(xAxis);
+  }
+
+  // Colors by key
+  var color = d3.scale.category10();
+
+  // Lines (paths)
+  var lines = svg.selectAll(".line").data(data, function(d) { return d[0].name; }).attr("class","line");
+
+  lines.enter()
+  .append("path")
+  .attr("class","line")
+  .attr("d",line)
+  .on('mouseover', lineCallback.mouseover)
+  .on('mouseout', lineCallback.mouseout)
+  .style("stroke", function(d){
+    var key = d[0].name;
+    return color(key);
+  });
+
+  lines.exit().remove();
+
+  // Labels (text)
+  var labels = svg.selectAll(".chart-label").data(data, function(d) { return d[0].name; }).attr("class","chart-label");
+
+  labels.enter()
+    .append("text")
+    .attr("class","chart-label")
+    .attr("transform", function(d) {
+      var datum = d[d.length - 1];
+      var value = datum[valueKey];
+      return "translate(" + (width - margin.left - margin.right + 10) + "," + yScale(datum[valueKey]) + ")"})
+    .style("fill", function(d){ return color(d[0].name); })
+    .style("font-size","12px")
+    .text(function(d){ return d[0].name });
+
+  labels.exit().remove();
+
+  // Animations to transition from relative to absolute mode
+  lines.transition().duration(transitionAnimationDuration)
+    .attr("d",line);
+
+  labels.transition().duration(transitionAnimationDuration)
+    .attr("transform", function(d) {
+        var datum = d[d.length - 1];
+        var value = datum[valueKey];
+        return "translate(" + (width - margin.left - margin.right + 10) + "," + yScale(datum[valueKey]) + ")"});
+}
+

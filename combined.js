@@ -5,15 +5,11 @@ var absoluteMode = true;
 /////////////////////////////////
 
 var mouseoverCallback = function(countryName) {
-    console.log("mouseover: "+countryName);
-
     highlightChart(countryName, true);
     highlightMap(countryName, true);
 }
 
 var mouseoutCallback = function(countryName) {
-    console.log("mouseout: "+countryName);
-
     highlightChart(countryName, false);
     highlightMap(countryName, false);
 }

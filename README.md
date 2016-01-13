@@ -12,5 +12,6 @@ We do this so we can load remote libraries in the future; currently we keep loca
 
 ## TODO
 
-1. On mouseover of line, highlight country too
-2. On mouseover of country, highlight line too
+1. Why the hell doesn't Saudi work?
+2. Add legend to map (show color scale of user growth, absolute and relative)
+3. Make button change text

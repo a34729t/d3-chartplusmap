@@ -35,7 +35,13 @@ function setupChart(mouseoverCallback, mouseoutCallback) {
 function highlightChart(name, highlight) {
   var line = svg.select("#"+name+"-line");
   var label = svg.select("#"+name+"-label");
+
   if (highlight) {
+    console.log("#"+name+"-line");
+    console.log(line);
+
+
+
     line
       .attr('stroke-width', '') // Un-sets the "explicit" stroke-width
       .classed("active-line", true ); // should then accept stroke-width from CSS
@@ -50,26 +56,18 @@ function highlightChart(name, highlight) {
   }
 }
 
-var lineCallback = {
+var chartElementCallback = {
 
   // TODO: Bold the text of the corresponding label
 
   mouseover: function(d){
     var countryName = d[0].name;
     mouseoverCallback(countryName);
-
-    // d3.select(this)
-    //   .attr('stroke-width', '') // Un-sets the "explicit" stroke-width
-    //   .classed("active-line", true ); // should then accept stroke-width from CSS
   },
 
   mouseout: function(d){
     var countryName = d[0].name;
     mouseoutCallback(countryName);
-
-    // d3.select(this)
-    //   .classed("active-line", false)
-    //   .attr('stroke-width', function(d) { return d[valueKey]; }) // Re-sets the "explicit" stroke-width
   }
 };
 
@@ -120,8 +118,8 @@ function renderChart(absoluteMode, valueKey){
   .attr("class","line")
   .attr("id", function(d){ return d[0].name + "-line" })
   .attr("d",line)
-  .on('mouseover', lineCallback.mouseover)
-  .on('mouseout', lineCallback.mouseout)
+  .on('mouseover', chartElementCallback.mouseover)
+  .on('mouseout', chartElementCallback.mouseout)
   .style("stroke", function(d){
     var key = d[0].name;
     return color(key);
@@ -136,6 +134,8 @@ function renderChart(absoluteMode, valueKey){
     .append("text")
     .attr("class", "chart-label")
     .attr("id", function(d){ return d[0].name + "-label" })
+    .on('mouseover', chartElementCallback.mouseover)
+    .on('mouseout', chartElementCallback.mouseout)
     .attr("transform", function(d) {
       var datum = d[d.length - 1];
       var value = datum[valueKey];

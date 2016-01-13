@@ -1,5 +1,6 @@
 var svg, xScale, yScale;
 var width, height, margin;
+var mouseoverCallback, mouseoutCallback;
 
 var line = d3.svg.line().interpolate("monotone")
 .x(function(d){ return xScale(d.date); })
@@ -7,10 +8,13 @@ var line = d3.svg.line().interpolate("monotone")
   return yScale(d[valueKey]);
 });
 
-function setupChart(callback) {
+function setupChart(mouseoverCallback, mouseoutCallback) {
   width = chartWidth;
   height = chartHeight;
   margin = {top: 20, right:100, bottom:100, left:70};
+
+  mouseoverCallback = mouseoverCallback;
+  mouseoutCallback = mouseoutCallback;
 
   // TODO: Make svg go into correct div instead of failing pathetically
 
@@ -35,10 +39,14 @@ function highlightChart(name, highlight) {
     line
       .attr('stroke-width', '') // Un-sets the "explicit" stroke-width
       .classed("active-line", true ); // should then accept stroke-width from CSS
+
+    label.style("font-size","15px");
   } else {
     line
       .classed("active-line", false)
       .attr('stroke-width', function(d) { return d[valueKey]; }) // Re-sets the "explicit" stroke-width
+
+    label.style("font-size","12px");
   }
 }
 
@@ -46,21 +54,23 @@ var lineCallback = {
 
   // TODO: Bold the text of the corresponding label
 
-  // mouseover: function(d){
-  //   var countryName = d[0].name;
+  mouseover: function(d){
+    var countryName = d[0].name;
+    mouseoverCallback(countryName);
 
-  //   d3.select(this)
-  //     .attr('stroke-width', '') // Un-sets the "explicit" stroke-width
-  //     .classed("active-line", true ); // should then accept stroke-width from CSS
-  // },
+    // d3.select(this)
+    //   .attr('stroke-width', '') // Un-sets the "explicit" stroke-width
+    //   .classed("active-line", true ); // should then accept stroke-width from CSS
+  },
 
-  // mouseout: function(d){
-  //   var countryName = d[0].name;
+  mouseout: function(d){
+    var countryName = d[0].name;
+    mouseoutCallback(countryName);
 
-  //   d3.select(this)
-  //     .classed("active-line", false)
-  //     .attr('stroke-width', function(d) { return d[valueKey]; }) // Re-sets the "explicit" stroke-width
-  // }
+    // d3.select(this)
+    //   .classed("active-line", false)
+    //   .attr('stroke-width', function(d) { return d[valueKey]; }) // Re-sets the "explicit" stroke-width
+  }
 };
 
 function renderChart(absoluteMode, valueKey){

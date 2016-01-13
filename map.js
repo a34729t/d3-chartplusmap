@@ -37,36 +37,13 @@ function setupMap(mouseoverCallback, mouseoutCallback) {
 
 function highlightMap(name, highlight) {
     var code = country2Code[name];
-    if (!code) {
+    if (!code)
         return;
-    }
-    var countryElements = map.svg.select(".datamaps-subunit."+code);
-    if (!countryElements) {
-        return;
-    }
-    var countryElement = countryElements[0][0];
-    if (!countryElement) {
-        return;
-    }
 
     if (highlight) {
-        console.log(countryElement);
-        countryElement.style("fill", "PaleGoldenRod");
-
-        // countryElement('stroke-width', 10);
-        // countryElement('fill', 'rgba(23,48,210,0.9)');
-
-        
-        // realColor = countryElement.style('stroke');
-
-        // var color2country = {}
-        // color2country[code] = 'rgba(23,48,210,0.9)';
-        // map.updateChoropleth(color2country);
+        map.svg.select(".datamaps-subunit."+code).style("stroke-width", "3");
     } else {
-        // reset color
-        // var color2country = {}
-        // color2country[code] = realColor;
-        // map.updateChoropleth(color2country);
+        map.svg.select(".datamaps-subunit."+code).style("stroke-width", "1");
     }
 }
 

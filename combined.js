@@ -22,7 +22,7 @@ getData("http://localhost:8000/country_data.json", function(newData) {
     data = newData;
 
     // setup
-    setupChart(mouseoverCallback);
+    setupChart(mouseoverCallback, mouseoutCallback);
     setupMap(mouseoverCallback, mouseoutCallback);
 
     // initial page render

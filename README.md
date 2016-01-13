@@ -9,3 +9,8 @@ Start Python server to serve local files
 Then, go to [port 8000 on local](hosthttp://localhost:8000/index.html).
 
 We do this so we can load remote libraries in the future; currently we keep local copies of D3 et. al.
+
+## TODO
+
+1. On mouseover of line, highlight country too
+2. On mouseover of country, highlight line too

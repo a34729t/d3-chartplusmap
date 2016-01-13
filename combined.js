@@ -4,16 +4,26 @@ var absoluteMode = true;
 // On page load
 /////////////////////////////////
 
-var mouseoverCombinedCallback = function(countryName) {
+var mouseoverCallback = function(countryName) {
     console.log("mouseover: "+countryName);
+
+    highlightChart(countryName, true);
+    highlightMap(countryName, true);
+}
+
+var mouseoutCallback = function(countryName) {
+    console.log("mouseout: "+countryName);
+
+    highlightChart(countryName, false);
+    highlightMap(countryName, false);
 }
 
 getData("http://localhost:8000/country_data.json", function(newData) {
     data = newData;
 
     // setup
-    setupChart(mouseoverCombinedCallback);
-    setupMap(mouseoverCombinedCallback);
+    setupChart(mouseoverCallback);
+    setupMap(mouseoverCallback, mouseoutCallback);
 
     // initial page render
     render(absoluteMode);

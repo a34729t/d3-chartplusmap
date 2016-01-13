@@ -1,6 +1,8 @@
 var map;
+var dataType;
+var colorScale;
 
-function setupMap(callback) {
+function setupMap(mouseoverCallback, mouseoutCallback) {
     var width = mapWidth;
     var height = mapHeight;
 
@@ -21,12 +23,51 @@ function setupMap(callback) {
         done: function(datamap) {
             datamap.svg.selectAll('.datamaps-subunit').on('mouseover', function(geography) {
                 var countryName = geography.properties.name;
-                callback(countryName);
+                mouseoverCallback(countryName);
+            });
+            datamap.svg.selectAll('.datamaps-subunit').on('mouseout', function(geography) {
+                var countryName = geography.properties.name;
+                mouseoutCallback(countryName);
             });
         }
     });
 
     // TODO: Legend
+}
+
+function highlightMap(name, highlight) {
+    var code = country2Code[name];
+    if (!code) {
+        return;
+    }
+    var countryElements = map.svg.select(".datamaps-subunit."+code);
+    if (!countryElements) {
+        return;
+    }
+    var countryElement = countryElements[0][0];
+    if (!countryElement) {
+        return;
+    }
+
+    if (highlight) {
+        console.log(countryElement);
+        countryElement.style("fill", "PaleGoldenRod");
+
+        // countryElement('stroke-width', 10);
+        // countryElement('fill', 'rgba(23,48,210,0.9)');
+
+        
+        // realColor = countryElement.style('stroke');
+
+        // var color2country = {}
+        // color2country[code] = 'rgba(23,48,210,0.9)';
+        // map.updateChoropleth(color2country);
+    } else {
+        // reset color
+        // var color2country = {}
+        // color2country[code] = realColor;
+        // map.updateChoropleth(color2country);
+    }
 }
 
 function calculateColors(min, max, pivot) {
@@ -47,19 +88,8 @@ function calculateColors(min, max, pivot) {
     return colorScale;
 }
 
-function selectCountry(countryName) {
-    console.log("update brazil color");
-    var code = country2Code[countryName];
-    var country = map.svg.selectAll('.datamaps-subunit '+code)
-
-    country
-        .style("fill", "#000000");
-    // var color2country = {code: "#000000"};
-    // map.updateChoropleth(color2country);
-}
-
 function renderMap(absoluteMode, valueKey) {
-    var dataType = absoluteMode ? "value" : "valuePercent"  
+    dataType = absoluteMode ? "value" : "valuePercent"  
     
     // Range of data
     var min, max, pivot;
@@ -75,12 +105,12 @@ function renderMap(absoluteMode, valueKey) {
         max = 100;
     }
 
-    var colorScale = calculateColors(min, max, pivot);
+    colorScale = calculateColors(min, max, pivot);
 
     var color2country = {}
     for (var i = 0; i < data.length; i++) {
         var countryData = data[i];
-        var firstDatum = countryData[5];
+        var firstDatum = countryData[countryData.length - 1];
 
         var code = country2Code[firstDatum.name];
         var colorValue = colorScale(firstDatum[dataType]);
@@ -90,8 +120,6 @@ function renderMap(absoluteMode, valueKey) {
     }
 
     map.updateChoropleth(color2country);
-
-    selectCountry("Brazil");
 }
 
 

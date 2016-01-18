@@ -32,7 +32,7 @@ function render(absoluteMode) {
     valueKey = absoluteMode ? "value" : "valuePercent";
 
     renderChart(absoluteMode, valueKey);
-    renderMap(absoluteMode, valueKey); 
+    renderMap(absoluteMode, valueKey);
 }
 
 function changeMode() {
@@ -47,6 +47,6 @@ function changeMode() {
 
     // TODO: Size chart properly (make it absolute sized)
     // TODO: Figure out why chart does not go to correct spot (it is part of body, instead of div)
-    
+
     render(absoluteMode);
 }

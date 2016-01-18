@@ -29,3 +29,7 @@ body {
 .active-chart-label {
     font-size: "20px";
 }
+
+.legend {
+  font-size: 12px;
+}

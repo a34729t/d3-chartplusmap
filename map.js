@@ -2,34 +2,6 @@ var map;
 var dataType;
 var colorScale;
 
-function calculateColors(min, max, pivot, absoluteMode) {
-    // TODO: Come up with a bad - good colorscale that works well for positive and negative ranges (and for high and low user numbers)
-    // TODO: Dynamically change the domain of the data (based on relative growth vs absolute growth)
-
-    // QUANTILE
-    // var colors = ["#ffffd9","#edf8b1","#c7e9b4","#7fcdbb","#41b6c4","#1d91c0","#225ea8","#253494","#081d58"];
-    // var colorScale = d3.scale.quantile()
-    //     .domain([min, max])
-    //     .range(colors);
-
-    // LINEAR
-    var colorScale = d3.scale.linear()
-        .domain([min, pivot, max])
-        .range(['red', 'yellow', 'green']);
-
-
-
-    if (absoluteMode) {
-
-    } else {
-
-    }
-
-
-
-    return colorScale;
-}
-
 function setupMap(mouseoverCallback, mouseoutCallback) {
     var width = mapWidth;
     var height = mapHeight;
@@ -59,19 +31,15 @@ function setupMap(mouseoverCallback, mouseoutCallback) {
             });
         }
     });
+}
 
+function setupLegend(absoluteMode, colorData) {
+    // Remove old legend
+    map.svg.selectAll(".legend").remove();
 
-    //Adding legend for our Choropleth
-    var color_domain = [50, 150, 350, 750, 1500];
-    var legend_labels = ["< 50", "50+", "150+", "350+", "750+", "> 1500"];
-    var ext_color_domain = [0, 50, 150, 350, 750, 1500];
-    var colorScale = d3.scale.threshold()
-        .domain(color_domain)
-        .range(["#adfcad", "#ffcb40", "#ffba00", "#ff7d73", "#ff4e40", "#ff1300"]);
-
-
+    // Draw new legend
     var legend = map.svg.selectAll("g.legend")
-        .data(ext_color_domain)
+        .data(colorData.ext_domain)
         .enter().append("g")
         .attr("class", "legend");
 
@@ -81,27 +49,29 @@ function setupMap(mouseoverCallback, mouseoutCallback) {
     legend.append("rect")
         .attr("x", 20)
         .attr("y", function(d, i) {
-            return height - (i * ls_h) - 2 * ls_h;
+            return height - (i * ls_h) - 2 * ls_h + (mapHeight/2);
         })
         .attr("width", ls_w)
         .attr("height", ls_h)
         .style("fill", function(d, i) {
-            return colorScale(d);
+            return colorData.scale(d);
         })
         .style("opacity", 0.8);
 
     legend.append("text")
         .attr("x", 50)
         .attr("y", function(d, i) {
-            return height - (i * ls_h) - ls_h - 4;
+            return height - (i * ls_h) - ls_h - 4  + (mapHeight/2);
         })
         .text(function(d, i) {
-            return legend_labels[i];
+            return colorData.labels[i];
         });
-}
 
-function setupLegend() {
-
+    // TODO: Crappy legend label
+    legend.append("text")
+        .attr("x", 20)
+        .attr("y", height + (mapHeight/2) - (ls_h * mapLegendBuckets + ls_h + 10))
+        .text(absoluteMode ? "Population Growth" : "Population Growth (%)");
 }
 
 function highlightMap(name, highlight) {
@@ -119,6 +89,38 @@ function highlightMap(name, highlight) {
 function renderMap(absoluteMode, valueKey) {
     dataType = absoluteMode ? "value" : "valuePercent"
 
+    colorData = setupColors(absoluteMode);
+    setupLegend(absoluteMode, colorData);
+
+    var color2country = {}
+    for (var i = 0; i < data.length; i++) {
+        var countryData = data[i];
+        var firstDatum = countryData[countryData.length - 1];
+
+        var code = country2Code[firstDatum.name];
+        var value = firstDatum[dataType];
+        var colorValue = colorData.scale(value);
+        color2country[code] = colorValue;
+    }
+
+    map.updateChoropleth(color2country);
+}
+
+
+
+// On page load
+/////////////////////////////////
+
+// resize page
+// window.addEventListener('resize', function(event){
+//     console.log("Window resize");
+//     map.resize();
+// });
+
+// Colors
+/////////////////////////////////
+
+function setupColors(absoluteMode) {
     // Range of data
     var min, max, pivot;
 
@@ -133,30 +135,56 @@ function renderMap(absoluteMode, valueKey) {
         max = 100;
     }
 
-    colorScale = calculateColors(min, max, pivot);
-    // TODO: Update legend
+    // Do some calculation of the proper buckets for the legend
+    var color_domain = [];
+    var ext_color_domain = [];
+    var legend_labels = [];
 
-    var color2country = {}
-    for (var i = 0; i < data.length; i++) {
-        var countryData = data[i];
-        var firstDatum = countryData[countryData.length - 1];
-
-        var code = country2Code[firstDatum.name];
-        var colorValue = colorScale(firstDatum[dataType]);
-        console.log("code = " + code + ", color = " + colorValue);
-
-        color2country[code] = colorValue;
+    var stepValue
+    if (absoluteMode) {
+        stepValue = max/mapLegendBuckets;
+    } else {
+        stepValue = (max - min) / (mapLegendBuckets - 1)
     }
 
-    map.updateChoropleth(color2country);
+    console.log("min = "+min+", max = "+ max);
+    console.log("mapLegendBuckets = "+mapLegendBuckets);
+    console.log("stepValue = "+stepValue);
+
+    for(var i = 0; i < mapLegendBuckets; i++) {
+        var bucketValue;
+        if (absoluteMode) {
+            bucketValue = Math.round(i * stepValue / 100) * 100;
+        } else {
+            bucketValue = Math.round((i * stepValue) + min);
+        }
+
+        if (i == 0) {
+            legend_labels.push(bucketValue);
+        } else if (i == mapLegendBuckets - 1) {
+            legend_labels.push(bucketValue + "+");
+        } else {
+            legend_labels.push(bucketValue);
+        }
+
+        if (i == mapLegendBuckets - 1) {
+            color_domain.push(bucketValue * 1.01);
+            ext_color_domain.push(bucketValue * 1.01);
+        } else {
+            color_domain.push(bucketValue);
+            ext_color_domain.push(bucketValue);
+        }
+    }
+    
+    var colorScale = d3.scale.linear()
+        .domain(color_domain)
+        .range(["#130443", "#42043C", "#710435", "#A0042E", "#CF0427", "#FF0520"]);
+
+
+    return {
+        domain: color_domain,
+        ext_domain: ext_color_domain,
+        labels: legend_labels,
+        scale: colorScale
+    };
 }
-
-
-// On page load
-/////////////////////////////////
-
-// resize page
-// window.addEventListener('resize', function(event){
-//     console.log("Window resize");
-//     map.resize();
-// });

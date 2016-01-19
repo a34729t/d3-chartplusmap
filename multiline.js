@@ -17,7 +17,7 @@ function setupChart(mouseoverCallback, mouseoutCallback) {
         top: 20,
         right: 100,
         bottom: 100,
-        left: 70
+        left: 100
     };
 
     mouseoverCallback = mouseoverCallback;
@@ -71,12 +71,14 @@ var chartElementCallback = {
 
     mouseover: function(d) {
         var countryName = d[0].name;
-        mouseoverCallback(countryName);
+        var countryCode = d[0].code;
+        mouseoverCallback(countryName, countryCode);
     },
 
     mouseout: function(d) {
         var countryName = d[0].name;
-        mouseoutCallback(countryName);
+        var countryCode = d[0].code;
+        mouseoutCallback(countryName, countryCode);
     }
 };
 

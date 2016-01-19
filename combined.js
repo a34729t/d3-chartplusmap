@@ -4,17 +4,17 @@ var absoluteMode = true;
 // On page load
 /////////////////////////////////
 
-var mouseoverCallback = function(countryName) {
+var mouseoverCallback = function(countryName, countryCode) {
     highlightChart(countryName, true);
-    highlightMap(countryName, true);
+    highlightMap(countryCode, true);
 }
 
-var mouseoutCallback = function(countryName) {
+var mouseoutCallback = function(countryName, countryCode) {
     highlightChart(countryName, false);
-    highlightMap(countryName, false);
+    highlightMap(countryCode, false);
 }
 
-getData("http://localhost:8000/country_data.json", function(newData) {
+getData("http://localhost:8000/all_country_data.json", function(newData) {
     data = newData;
 
     // setup

@@ -28,6 +28,7 @@ function getData(dataURL, callback) {
 }
 
 function dateRange(data) {
+    console.log(data);
     var xMin = data.reduce(function(pv,cv){
         var currentMin = cv.reduce(function(pv,cv){
           return pv.date < cv.date ? pv : cv;

@@ -23,11 +23,13 @@ function setupMap(mouseoverCallback, mouseoutCallback) {
         done: function(datamap) {
             datamap.svg.selectAll('.datamaps-subunit').on('mouseover', function(geography) {
                 var countryName = geography.properties.name;
-                mouseoverCallback(countryName);
+                var countryCode = geography.id;
+                mouseoverCallback(countryName, countryCode);
             });
             datamap.svg.selectAll('.datamaps-subunit').on('mouseout', function(geography) {
                 var countryName = geography.properties.name;
-                mouseoutCallback(countryName);
+                var countryCode = geography.id;
+                mouseoutCallback(countryName, countryCode);
             });
         }
     });
@@ -74,10 +76,7 @@ function setupLegend(absoluteMode, colorData) {
         .text(absoluteMode ? "Population Growth" : "Population Growth (%)");
 }
 
-function highlightMap(name, highlight) {
-    var code = country2Code[name];
-    if (!code)
-        return;
+function highlightMap(code, highlight) {
 
     if (highlight) {
         map.svg.select(".datamaps-subunit." + code).style("stroke-width", "3");
@@ -97,7 +96,7 @@ function renderMap(absoluteMode, valueKey) {
         var countryData = data[i];
         var firstDatum = countryData[countryData.length - 1];
 
-        var code = country2Code[firstDatum.name];
+        var code = firstDatum.code;
         var value = firstDatum[dataType];
         var colorValue = colorData.scale(value);
         color2country[code] = colorValue;

@@ -14,7 +14,7 @@ var mouseoutCallback = function(countryName, countryCode) {
     highlightMap(countryCode, false);
 }
 
-getData("http://localhost:8000/all_country_data.json", function(newData) {
+getData("http://localhost:8000/country_data_all.json", function(newData) {
     data = newData;
 
     // setup

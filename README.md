@@ -10,8 +10,10 @@ Then, go to [port 8000 on local](http://localhost:8000/index.html).
 
 We do this so we can load remote libraries in the future; currently we keep local copies of D3 et. al.
 
-## TODO
+## Generate fake data
 
-1. Why the hell doesn't Saudi work?
-2. Add legend to map (show color scale of user growth, absolute and relative)
-3. Make button change text
+Generate fake data using this command:
+
+	python generate_fake_data.py > all_country_data.json
+
+Currently, it generates data for the past 180 days, and saves only the Saturdays for each week. To change this, modify the script's source code.

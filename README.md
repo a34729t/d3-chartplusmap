@@ -1,5 +1,7 @@
 # D3 Chart + Map with Common Data
 
+![Example image](https://github.com/a34729t/d3-chartplusmap/blob/master/sample.png)
+
 ## Runbook
 
 Start Python server to serve local files

@@ -19,3 +19,8 @@ Generate fake data using this command:
 	python generate_fake_data.py > all_country_data.json
 
 Currently, it generates data for the past 180 days, and saves only the Saturdays for each week. To change this, modify the script's source code.
+
+## Todos
+
+* Adjust date range
+* Improve button; I'd like 4 modes: Absolute, relative (growth %), and both of these weighted against the population of the country (saturation)
